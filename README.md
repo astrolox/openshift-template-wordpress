@@ -1,3 +1,3 @@
 
-Testing purposes only - not for serious use
+Testing purposes only - do not use for anything remotely production
 

@@ -1,0 +1,108 @@
+{
+  "name":"WordPress 4 WIP",
+  "description":"WordPress blogging tool and a content management system (CMS)",
+  "_id":"wordpress-4-wip",
+  "newProjectOnly":true,
+  "labels":[
+    "wip",
+    "experimental",
+    "newproject",
+    "curatedapplication",
+    "scripting-php-php5",
+    "database-mariadb-mariadb10",
+    "app-wordpress-wordpress4",
+    "tool-phpmyadmin-phpmyadmin4"
+  ],
+  "minimum_specification":{
+    "cpu":0.5,
+    "ram":256,
+    "storage":1
+  },
+  "actions":{
+
+  },
+  "tenants":{
+    "only":[
+
+    ]
+  },
+  "visibility":{
+    "only":[
+      "template_tester",
+      "beta"
+    ]
+  },
+  "services":[
+    {
+      "name":"php",
+      "labels":[
+        "scripting-php-php5",
+        "app-wordpress4-wordpress4",
+        "supports-publichttp",
+        "supports-ssh",
+        "supports-cron"
+      ],
+      "pods":[
+        "php"
+      ]
+    },
+    {
+      "name":"mariadb",
+      "labels":[
+        "database-mariadb-mariadb10",
+        "tool-phpmyadmin-phpmyadmin4",
+        "supports-publicip",
+        "supports-ssh",
+        "supports-cron"
+      ],
+      "pods":[
+        "mariadb",
+        "dbadmin"
+      ]
+    }
+  ],
+  "parameters":[
+    {
+      "name":"TEST_URL_HOSTNAME",
+      "displayName":"Test URL hostname",
+      "description":"The exposed hostname that routes to the new WordPress blog",
+      "datatype":"string",
+      "readonly":true,
+      "autohostname":true
+    },
+    {
+      "name":"DATABASE_ADMIN_URL_HOSTNAME",
+      "displayName":"Database admin URL hostname",
+      "description":"The exposed hostname that routes to the admin interface for the database",
+      "datatype":"string",
+      "from":"database[A-Z0-9]{3}",
+      "autohostname":true,
+      "readonly":true
+    },
+    {
+      "name":"UID",
+      "displayName":"Linux user ID number",
+      "description":"The linux user ID number which everything must run under",
+      "value":"1001",
+      "autouid":true,
+      "readonly":true,
+      "hidden":true
+    },
+    {
+      "name":"DATABASE_ADMIN_USER",
+      "displayName":"Database admin username",
+      "description":"Username for the database admin user which you can use to administer the database",
+      "datatype":"string",
+      "from":"root",
+      "readonly":true
+    },
+    {
+      "name":"DATABASE_ADMIN_PASSWORD",
+      "displayName":"Database admin password",
+      "description":"Password for the database admin user which you can use to administer the database",
+      "datatype":"password",
+      "from":"[a-zA-Z0-9]{16}",
+      "validation":"[a-zA-Z0-9]{8,32}"
+    }
+  ]
+}
