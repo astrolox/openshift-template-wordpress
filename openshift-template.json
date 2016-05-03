@@ -175,7 +175,7 @@
                                         "containerPort": 80
                                     }
                                 ],
-                                "image": "wordpress",
+                                "image": "wordpress:latest",
                                 "name": "${APP_SERVICE_NAME}",
                                 "volumeMounts": [
                                     {
@@ -302,7 +302,7 @@
                                         "containerPort": 80
                                     }
                                 ],
-                                "image": "astrolox/wip-phpmyadmin",
+                                "image": "astrolox/wip-phpmyadmin:latest",
                                 "name": "${DATABASE_ADMIN_SERVICE_NAME}"
                             }
                         ]
@@ -400,7 +400,7 @@
                                         "containerPort": 3306
                                     }
                                 ],
-                                "image": "mariadb",
+                                "image": "mariadb:latest",
                                 "name": "${DATABASE_SERVICE_NAME}",
                                 "volumeMounts": [
                                     {
