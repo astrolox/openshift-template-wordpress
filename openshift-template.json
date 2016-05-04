@@ -147,7 +147,7 @@
                     "spec": {
                         "containers": [
                             {
-                                "image": "wordpress:latest",
+                                "image": "wordpress:4.5.1-fpm",
                                 "name": "${APP_SERVICE_NAME}",
                                 "volumeMounts": [
                                     {
@@ -368,7 +368,7 @@
                     "spec": {
                         "containers": [
                             {
-                                "image": "mariadb:latest",
+                                "image": "mariadb:10.1.13",
                                 "name": "${DATABASE_SERVICE_NAME}",
                                 "volumeMounts": [
                                     {
