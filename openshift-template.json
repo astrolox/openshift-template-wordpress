@@ -97,7 +97,7 @@
                         "containers": [
                             {
                                 "name": "${APP_SERVICE_NAME}",
-                                "image": "wordpress",
+                                "image": "wordpress:4.5.1-fpm",
                                 "ports": [
                                     {
                                         "containerPort": 80
@@ -232,7 +232,7 @@
                         "containers": [
                             {
                                 "name": "${DATABASE_ADMIN_SERVICE_NAME}",
-                                "image": "astrolox/wip-phpmyadmin",
+                                "image": "astrolox/wip-phpmyadmin:latest",
                                 "ports": [
                                     {
                                         "containerPort": 80
@@ -318,7 +318,7 @@
                         "containers": [
                             {
                                 "name": "${DATABASE_SERVICE_NAME}",
-                                "image": "mariadb",
+                                "image": "mariadb:10.1.13",
                                 "ports": [
                                     {
                                         "containerPort": 3306
