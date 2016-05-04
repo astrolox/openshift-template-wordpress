@@ -232,7 +232,7 @@
                         "containers": [
                             {
                                 "name": "${DATABASE_ADMIN_SERVICE_NAME}",
-                                "image": "astrolox/wip-phpmyadmin:latest",
+                                "image": "astrolox/wip-phpmyadmin:v4",
                                 "ports": [
                                     {
                                         "containerPort": 80
