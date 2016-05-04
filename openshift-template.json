@@ -1,82 +1,79 @@
 {
+    "parameters": [
+        {
+            "value": "",
+            "description": "The linux user ID number which everything must run under",
+            "name": "UID",
+            "displayName": "Linux user ID number"
+        },
+        {
+            "value": "",
+            "description": "The exposed hostname that routes to the new WordPress blog",
+            "name": "TEST_URL_HOSTNAME",
+            "displayName": "Test URL hostname"
+        },
+        {
+            "value": "",
+            "description": "The exposed hostname that routes to the admin interface for the database",
+            "name": "DATABASE_ADMIN_URL_HOSTNAME",
+            "displayName": "Database admin URL hostname"
+        },
+        {
+            "required": true,
+            "generate": "expression",
+            "name": "DEFAULT_DATABASE_PASSWORD",
+            "from": "[a-zA-Z0-9]{24}",
+            "description": "Password for the WordPress database user",
+            "displayName": "Database password"
+        },
+        {
+            "required": true,
+            "generate": "expression",
+            "name": "DATABASE_ADMIN_PASSWORD",
+            "from": "[a-zA-Z0-9]{16}",
+            "description": "Password for the database admin user which you can use to administer the database",
+            "displayName": "Database administrator password"
+        },
+        {
+            "required": true,
+            "generate": "expression",
+            "name": "APP_SERVICE_NAME",
+            "from": "php[0-9]{3}",
+            "description": "Application service name",
+            "displayName": "Application service name"
+        },
+        {
+            "required": true,
+            "generate": "expression",
+            "name": "DATABASE_SERVICE_NAME",
+            "from": "mariadb[0-9]{3}",
+            "description": "Database service name",
+            "displayName": "Database service name"
+        },
+        {
+            "required": true,
+            "generate": "expression",
+            "name": "DATABASE_ADMIN_SERVICE_NAME",
+            "from": "dbadmin[0-9]{3}",
+            "description": "Database admin service name",
+            "displayName": "Database admin service name"
+        }
+    ],
     "metadata": {
         "annotations": {
             "description": "WordPress blogging tool and a content management system (CMS)"
         },
         "name": "wordpress-4-wip"
     },
-    "kind": "Template",
-    "parameters": [
-        {
-            "displayName": "Linux user ID number",
-            "value": "",
-            "description": "The linux user ID number which everything must run under",
-            "name": "UID"
-        },
-        {
-            "displayName": "Test URL hostname",
-            "value": "",
-            "description": "The exposed hostname that routes to the new WordPress blog",
-            "name": "TEST_URL_HOSTNAME"
-        },
-        {
-            "displayName": "Database admin URL hostname",
-            "value": "",
-            "description": "The exposed hostname that routes to the admin interface for the database",
-            "name": "DATABASE_ADMIN_URL_HOSTNAME"
-        },
-        {
-            "displayName": "Database password",
-            "generate": "expression",
-            "description": "Password for the WordPress database user",
-            "required": true,
-            "from": "[a-zA-Z0-9]{24}",
-            "name": "DEFAULT_DATABASE_PASSWORD"
-        },
-        {
-            "displayName": "Database administrator password",
-            "generate": "expression",
-            "description": "Password for the database admin user which you can use to administer the database",
-            "required": true,
-            "from": "[a-zA-Z0-9]{16}",
-            "name": "DATABASE_ADMIN_PASSWORD"
-        },
-        {
-            "displayName": "Application service name",
-            "generate": "expression",
-            "description": "Application service name",
-            "required": true,
-            "from": "php[0-9]{3}",
-            "name": "APP_SERVICE_NAME"
-        },
-        {
-            "displayName": "Database service name",
-            "generate": "expression",
-            "description": "Database service name",
-            "required": true,
-            "from": "mariadb[0-9]{3}",
-            "name": "DATABASE_SERVICE_NAME"
-        },
-        {
-            "displayName": "Database admin service name",
-            "generate": "expression",
-            "description": "Database admin service name",
-            "required": true,
-            "from": "dbadmin[0-9]{3}",
-            "name": "DATABASE_ADMIN_SERVICE_NAME"
-        }
-    ],
-    "apiVersion": "v1",
     "labels": {
         "test": "test101"
     },
     "objects": [
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
-                    "endpoint": "internal",
                     "readonly": "true",
+                    "endpoint": "internal",
                     "service": "php"
                 },
                 "annotations": {
@@ -84,6 +81,7 @@
                 },
                 "name": "${APP_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "Service",
             "spec": {
                 "selector": {
@@ -91,19 +89,18 @@
                 },
                 "ports": [
                     {
-                        "targetPort": 80,
+                        "name": "web",
                         "port": 80,
-                        "name": "web"
+                        "targetPort": 80
                     }
                 ]
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
-                    "endpoint": "public",
                     "readonly": "true",
+                    "endpoint": "public",
                     "service": "php"
                 },
                 "annotations": {
@@ -111,17 +108,17 @@
                 },
                 "name": "${APP_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "Route",
             "spec": {
+                "host": "${TEST_URL_HOSTNAME}",
                 "to": {
                     "kind": "Service",
                     "name": "${APP_SERVICE_NAME}"
-                },
-                "host": "${TEST_URL_HOSTNAME}"
+                }
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
                     "service": "php"
@@ -131,11 +128,9 @@
                 },
                 "name": "${APP_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "DeploymentConfig",
             "spec": {
-                "selector": {
-                    "name": "${APP_SERVICE_NAME}"
-                },
                 "triggers": [
                     {
                         "type": "ConfigChange"
@@ -144,14 +139,22 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "${APP_SERVICE_NAME}",
-                            "service": "php"
+                            "service": "php",
+                            "name": "${APP_SERVICE_NAME}"
                         },
                         "name": "${APP_SERVICE_NAME}"
                     },
                     "spec": {
                         "containers": [
                             {
+                                "image": "wordpress:latest",
+                                "name": "${APP_SERVICE_NAME}",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/www/html",
+                                        "name": "wordpress-data"
+                                    }
+                                ],
                                 "env": [
                                     {
                                         "value": "${DATABASE_SERVICE_NAME}",
@@ -174,14 +177,6 @@
                                     {
                                         "containerPort": 80
                                     }
-                                ],
-                                "image": "wordpress:latest",
-                                "name": "${APP_SERVICE_NAME}",
-                                "volumeMounts": [
-                                    {
-                                        "mountPath": "/var/www/html",
-                                        "name": "wordpress-data"
-                                    }
                                 ]
                             }
                         ],
@@ -196,19 +191,21 @@
                     }
                 },
                 "replicas": 1,
+                "selector": {
+                    "name": "${APP_SERVICE_NAME}"
+                },
                 "strategy": {
                     "type": "Recreate"
                 }
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
-                    "endpoint": "internal",
-                    "pod": "dbadmin",
-                    "internal": "true",
                     "readonly": "true",
+                    "internal": "true",
+                    "pod": "dbadmin",
+                    "endpoint": "internal",
                     "service": "mariadb"
                 },
                 "annotations": {
@@ -216,6 +213,7 @@
                 },
                 "name": "${DATABASE_ADMIN_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "Service",
             "spec": {
                 "selector": {
@@ -223,21 +221,20 @@
                 },
                 "ports": [
                     {
-                        "targetPort": 80,
+                        "name": "web",
                         "port": 80,
-                        "name": "web"
+                        "targetPort": 80
                     }
                 ]
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
-                    "endpoint": "internal",
-                    "pod": "dbadmin",
-                    "internal": "true",
                     "readonly": "true",
+                    "internal": "true",
+                    "pod": "dbadmin",
+                    "endpoint": "internal",
                     "service": "mariadb"
                 },
                 "annotations": {
@@ -245,17 +242,17 @@
                 },
                 "name": "${DATABASE_ADMIN_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "Route",
             "spec": {
+                "host": "${DATABASE_ADMIN_URL_HOSTNAME}",
                 "to": {
                     "kind": "Service",
                     "name": "${DATABASE_ADMIN_SERVICE_NAME}"
-                },
-                "host": "${DATABASE_ADMIN_URL_HOSTNAME}"
+                }
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
                     "service": "mariadb"
@@ -265,11 +262,9 @@
                 },
                 "name": "${DATABASE_ADMIN_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "DeploymentConfig",
             "spec": {
-                "selector": {
-                    "name": "${DATABASE_ADMIN_SERVICE_NAME}"
-                },
                 "triggers": [
                     {
                         "type": "ConfigChange"
@@ -278,8 +273,8 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "part": "dbadmin",
                             "tree": "3",
+                            "part": "dbadmin",
                             "name": "${DATABASE_ADMIN_SERVICE_NAME}"
                         },
                         "name": "${DATABASE_ADMIN_SERVICE_NAME}"
@@ -287,6 +282,8 @@
                     "spec": {
                         "containers": [
                             {
+                                "image": "astrolox/wip-phpmyadmin:latest",
+                                "name": "${DATABASE_ADMIN_SERVICE_NAME}",
                                 "env": [
                                     {
                                         "value": "${DATABASE_SERVICE_NAME}",
@@ -301,25 +298,25 @@
                                     {
                                         "containerPort": 80
                                     }
-                                ],
-                                "image": "astrolox/wip-phpmyadmin:latest",
-                                "name": "${DATABASE_ADMIN_SERVICE_NAME}"
+                                ]
                             }
                         ]
                     }
                 },
                 "replicas": 1,
+                "selector": {
+                    "name": "${DATABASE_ADMIN_SERVICE_NAME}"
+                },
                 "strategy": {
                     "type": "Recreate"
                 }
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
-                    "endpoint": "internal",
                     "readonly": "true",
+                    "endpoint": "internal",
                     "service": "mariadb"
                 },
                 "annotations": {
@@ -327,6 +324,7 @@
                 },
                 "name": "${DATABASE_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "Service",
             "spec": {
                 "selector": {
@@ -334,15 +332,14 @@
                 },
                 "ports": [
                     {
-                        "targetPort": 3306,
+                        "name": "${DATABASE_SERVICE_NAME}",
                         "port": 3306,
-                        "name": "${DATABASE_SERVICE_NAME}"
+                        "targetPort": 3306
                     }
                 ]
             }
         },
         {
-            "apiVersion": "v1",
             "metadata": {
                 "labels": {
                     "service": "mariadb"
@@ -352,11 +349,9 @@
                 },
                 "name": "${DATABASE_SERVICE_NAME}"
             },
+            "apiVersion": "v1",
             "kind": "DeploymentConfig",
             "spec": {
-                "selector": {
-                    "name": "${DATABASE_SERVICE_NAME}"
-                },
                 "triggers": [
                     {
                         "type": "ConfigChange"
@@ -365,14 +360,22 @@
                 "template": {
                     "metadata": {
                         "labels": {
-                            "name": "${DATABASE_SERVICE_NAME}",
-                            "service": "mariadb"
+                            "service": "mariadb",
+                            "name": "${DATABASE_SERVICE_NAME}"
                         },
                         "name": "${DATABASE_SERVICE_NAME}"
                     },
                     "spec": {
                         "containers": [
                             {
+                                "image": "mariadb:latest",
+                                "name": "${DATABASE_SERVICE_NAME}",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/mysql/data",
+                                        "name": "${DATABASE_SERVICE_NAME}-data"
+                                    }
+                                ],
                                 "env": [
                                     {
                                         "value": "wordpress",
@@ -399,14 +402,6 @@
                                     {
                                         "containerPort": 3306
                                     }
-                                ],
-                                "image": "mariadb:latest",
-                                "name": "${DATABASE_SERVICE_NAME}",
-                                "volumeMounts": [
-                                    {
-                                        "mountPath": "/var/lib/mysql/data",
-                                        "name": "${DATABASE_SERVICE_NAME}-data"
-                                    }
                                 ]
                             }
                         ],
@@ -421,10 +416,15 @@
                     }
                 },
                 "replicas": 1,
+                "selector": {
+                    "name": "${DATABASE_SERVICE_NAME}"
+                },
                 "strategy": {
                     "type": "Recreate"
                 }
             }
         }
-    ]
+    ],
+    "apiVersion": "v1",
+    "kind": "Template"
 }
